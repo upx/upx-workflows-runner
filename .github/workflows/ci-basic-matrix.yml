@@ -1,0 +1,112 @@
+# Copyright (C) Markus Franz Xaver Johannes Oberhumer
+
+name: 'CI basic matrix'
+
+on: [push, workflow_dispatch]
+
+jobs:
+  job-runner:
+    if: github.repository_owner == 'upx'
+#   name: ${{ format('{0} {1}', matrix.os, matrix.container) }}
+    name: ${{ format('{0} {1}', matrix.container && 'container' || matrix.os, matrix.container) }}
+    runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
+    env:
+      CONTAINER: ${{ matrix.container }}
+      DEBIAN_FRONTEND: noninteractive
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # GitHub - Ubuntu Linux x86_64 (amd64)
+          - { os: ubuntu-20.04 }
+          - { os: ubuntu-22.04 }
+          # GitHub - macOS x86_64 (amd64)
+          - { os: macos-11 }
+          - { os: macos-12 }
+          - { os: macos-13 }
+          - { os: macos-14 }
+          # GitHub - Windows x86_64 (amd64)
+          - { os: windows-2019 }
+          - { os: windows-2022 }
+          # Container - Alpine Linux x86_64 (amd64)
+          #   Alpine Linux 3.2.0 (May 2015): first release with a python3 package
+          - { os: ubuntu-latest, container: 'alpine:3.2' }
+          - { os: ubuntu-latest, container: 'alpine:3.3' }
+          - { os: ubuntu-latest, container: 'alpine:3.4' }
+          - { os: ubuntu-latest, container: 'alpine:3.5' }
+          - { os: ubuntu-latest, container: 'alpine:3.6' }
+          - { os: ubuntu-latest, container: 'alpine:3.7' }
+          - { os: ubuntu-latest, container: 'alpine:3.8' }
+          - { os: ubuntu-latest, container: 'alpine:3.9' }
+          - { os: ubuntu-latest, container: 'alpine:3.10' }
+          - { os: ubuntu-latest, container: 'alpine:3.11' }
+          - { os: ubuntu-latest, container: 'alpine:3.12' }
+          - { os: ubuntu-latest, container: 'alpine:3.13' }
+          - { os: ubuntu-latest, container: 'alpine:3.14' }
+          - { os: ubuntu-latest, container: 'alpine:3.15' }
+          - { os: ubuntu-latest, container: 'alpine:3.16' }
+          - { os: ubuntu-latest, container: 'alpine:3.17' }
+          - { os: ubuntu-latest, container: 'alpine:3.18' }
+          - { os: ubuntu-latest, container: 'alpine:3.19' }
+          - { os: ubuntu-latest, container: 'alpine:edge' }
+          # Container - Alpine Linux x86 (i386)
+          - { os: ubuntu-latest, container: 'i386/alpine:3.2' }
+          - { os: ubuntu-latest, container: 'i386/alpine:3.3' }
+          - { os: ubuntu-latest, container: 'i386/alpine:3.4' }
+          - { os: ubuntu-latest, container: 'i386/alpine:3.5' }
+          - { os: ubuntu-latest, container: 'i386/alpine:3.6' }
+          - { os: ubuntu-latest, container: 'i386/alpine:3.7' }
+          - { os: ubuntu-latest, container: 'i386/alpine:3.8' }
+          - { os: ubuntu-latest, container: 'i386/alpine:3.9' }
+          - { os: ubuntu-latest, container: 'i386/alpine:3.10' }
+          - { os: ubuntu-latest, container: 'i386/alpine:3.11' }
+          - { os: ubuntu-latest, container: 'i386/alpine:3.12' }
+          - { os: ubuntu-latest, container: 'i386/alpine:3.13' }
+          - { os: ubuntu-latest, container: 'i386/alpine:3.14' }
+          - { os: ubuntu-latest, container: 'i386/alpine:3.15' }
+          - { os: ubuntu-latest, container: 'i386/alpine:3.16' }
+          - { os: ubuntu-latest, container: 'i386/alpine:3.17' }
+          - { os: ubuntu-latest, container: 'i386/alpine:3.18' }
+          - { os: ubuntu-latest, container: 'i386/alpine:3.19' }
+          - { os: ubuntu-latest, container: 'i386/alpine:edge' }
+          # Container - Chimera Linux x86_64 (amd64)
+          - { os: ubuntu-latest, container: 'chimeralinux/chimera:latest' }
+          # Container - RHEL UBI x86_64 (amd64)
+          # { os: ubuntu-latest, container: 'registry.access.redhat.com/ubi7/ubi-minimal' } # FIXME: cmake is missing
+          - { os: ubuntu-latest, container: 'registry.access.redhat.com/ubi8/ubi-minimal' } # RHEL 8
+          - { os: ubuntu-latest, container: 'registry.access.redhat.com/ubi9/ubi-minimal' } # RHEL 9
+          # Container - Debian Linux x86_64 (amd64)
+          - { os: ubuntu-latest, container: 'debian:10-slim' }
+          - { os: ubuntu-latest, container: 'debian:11-slim' }
+          - { os: ubuntu-latest, container: 'debian:12-slim' }
+          # Container - Ubuntu Linux x86_64 (amd64)
+          - { os: ubuntu-latest, container: 'ubuntu:14.04' }
+          - { os: ubuntu-latest, container: 'ubuntu:16.04' }
+          - { os: ubuntu-latest, container: 'ubuntu:18.04' }
+          - { os: ubuntu-latest, container: 'ubuntu:20.04' }
+          - { os: ubuntu-latest, container: 'ubuntu:22.04' }
+          - { os: ubuntu-latest, container: 'ubuntu:23.10' }
+    steps:
+      - name: 'Bootstrap'
+        shell: sh
+        run: |
+          if test -n "$CONTAINER"; then true;
+          if test -f /etc/alpine-release; then true;
+            apk update && apk upgrade && apk add bash git
+          elif test -f /etc/chimera-release; then true;
+            apk update && apk upgrade && apk add bash git
+          elif test -f /etc/redhat-release && test -f /usr/bin/dnf; then true;
+            dnf update -y && dnf install -y bash git
+          elif test -f /etc/redhat-release && test -f /usr/bin/microdnf; then true;
+            microdnf update -y && microdnf install -y bash git
+          elif test -f /etc/debian_version; then true;
+            apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends bash ca-certificates git
+          fi
+          fi # CONTAINER
+          git config --global core.autocrlf false
+          git config --global --add safe.directory '*'
+          git clone --branch "$GITHUB_REF_NAME" --depth 1 "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" ../Self
+      - name: 'Init'
+        shell: sh
+        run: bash ../Self/.github/workflows/init.sh
