@@ -1,8 +1,8 @@
-#! /usr/bin/env bash
+#! /usr/bin/env sh
 ## vim:set ts=2 sw=2 et:
 ## Copyright (C) Markus Franz Xaver Johannes Oberhumer
-set -e; set -o pipefail
-export DEBIAN_FRONTEND=noninteractive
+set -e
+DEBIAN_FRONTEND=noninteractive; export DEBIAN_FRONTEND
 
 #***********************************************************************
 #

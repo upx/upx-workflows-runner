@@ -108,5 +108,6 @@ jobs:
           git config --global --add safe.directory '*'
           git clone --branch "$GITHUB_REF_NAME" --depth 1 "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" ../Self
       - name: 'Init'
-        shell: sh
         run: bash ../Self/.github/workflows/init.sh
+      - name: 'Build UPX'
+        run: bash ../Self/.github/workflows/build_upx.sh
