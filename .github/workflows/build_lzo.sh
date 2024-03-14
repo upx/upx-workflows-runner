@@ -7,22 +7,17 @@ set -e; set -o pipefail
 #
 #***********************************************************************
 
-if ! test -d upx-devel; then true;
-    git clone --branch devel --depth 1 https://github.com/upx/upx upx-devel
-    (cd upx-devel && test -f ./.gitmodules && git submodule update --init)
+if ! test -d lzo-2.10; then true;
+    curl -O http://www.oberhumer.com/opensource/lzo/download/lzo-2.10.tar.gz
+    tar -xzf lzo-2.10.tar.gz
 fi
-cd upx-devel
+cd lzo-2.10
 
 mkdir -p build/release
 cd build/release
 
-self_pack="-DUPX_CONFIG_DISABLE_SELF_PACK_TEST=OFF"
-if test -d /Library; then # disable self-pack on macOS
-    self_pack="-DUPX_CONFIG_DISABLE_SELF_PACK_TEST=ON"
-fi
-
 # note that "gcc" can be a symlink to "clang"
-CC=gcc CXX=g++ cmake ../.. -DCMAKE_VERBOSE_MAKEFILE=ON $self_pack
+CC=gcc CXX=g++ cmake ../.. -DCMAKE_VERBOSE_MAKEFILE=ON
 if test -f Makefile; then true;
     # prefer "make" as old CMake versions do not have "--parallel"
     make -j

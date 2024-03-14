@@ -110,4 +110,6 @@ jobs:
       - name: 'Init'
         run: bash ../Self/.github/workflows/init.sh
       - name: 'Build UPX'
-        run: bash ../Self/.github/workflows/build_upx.sh
+        run: bash ../Self/.github/workflows/build_lzo.sh
+#     - name: 'Build UPX'
+#       run: bash ../Self/.github/workflows/build_upx.sh
